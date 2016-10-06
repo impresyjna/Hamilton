@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
  */
 public class HalfTSPGreedyCycle {
 
-    public static HalfTSPResult GreedyCycle(Graph graph, int initialVertex) {
+    public static HalfTSPResult greedyCycle(Graph graph, int initialVertex) {
         HalfTSPResult result = new HalfTSPResult();
         ArrayList<Integer> path = new ArrayList<>();
         int cycleDistance = 0;
