@@ -15,13 +15,20 @@ public class Main {
             document = (Document) JAXBContext.newInstance(Document.class).createUnmarshaller().unmarshal(fileReader);
             Graph graph = document.getGraph();
 
-            //GreedyCycle wersja deterministyczna
+            //greedyCycle wersja deterministyczna
             greedyCycle(graph);
 
             System.out.println();
 
-            //GreedyCycle wersja niedeterministyczna
+            //greedyCycle wersja niedeterministyczna
             greedyCycle_GRASP(graph);
+
+            System.out.println();
+
+            //nearestNeighbour wersja deterministyczna
+            nearestNeighbour(graph);
+
+            System.out.println();
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -34,7 +41,7 @@ public class Main {
         int sum = 0;
         int average;
         for (int initialVertex = 0; initialVertex < graph.getVerticesCount(); ++initialVertex) {
-            HalfTSPResult result = HalfTSPGreedyCycle.GreedyCycle(graph, initialVertex);
+            HalfTSPResult result = HalfTSPGreedyCycle.greedyCycle(graph, initialVertex);
             int distance = result.getDistance();
             sum += distance;
             if (distance > max) {
@@ -62,6 +69,33 @@ public class Main {
         int average;
         for (int initialVertex = 0; initialVertex < graph.getVerticesCount(); ++initialVertex) {
             HalfTSPResult result = HalfTSPGreedyCycle.GRASP(graph, initialVertex);
+            int distance = result.getDistance();
+            sum += distance;
+            if (distance > max) {
+                max = distance;
+            } else if (distance < min) {
+                min = distance;
+                minPath = result.getPath();
+            }
+        }
+        average = sum / graph.getVerticesCount();
+        System.out.println("MAX: " + max);
+        System.out.println("MIN: " + min);
+        System.out.println("AVERAGE: " + average);
+        for (int vertex : minPath) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minPath.get(0));
+    }
+
+    private static void nearestNeighbour(Graph graph){
+        ArrayList<Integer> minPath = new ArrayList<>();
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+        int average;
+        for (int initialVertex = 0; initialVertex < graph.getVerticesCount(); ++initialVertex) {
+            HalfTSPResult result = HalfTSPNearestNeighbour.nearestNeighbour(graph, initialVertex);
             int distance = result.getDistance();
             sum += distance;
             if (distance > max) {
