@@ -17,6 +17,11 @@ public class Main {
 
             //GreedyCycle wersja deterministyczna
             greedyCycle(graph);
+
+            System.out.println();
+
+            //GreedyCycle wersja niedeterministyczna
+            greedyCycle_GRASP(graph);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -30,6 +35,33 @@ public class Main {
         int average;
         for (int initialVertex = 0; initialVertex < graph.getVerticesCount(); ++initialVertex) {
             HalfTSPResult result = HalfTSPGreedyCycle.GreedyCycle(graph, initialVertex);
+            int distance = result.getDistance();
+            sum += distance;
+            if (distance > max) {
+                max = distance;
+            } else if (distance < min) {
+                min = distance;
+                minPath = result.getPath();
+            }
+        }
+        average = sum / graph.getVerticesCount();
+        System.out.println("MAX: " + max);
+        System.out.println("MIN: " + min);
+        System.out.println("AVERAGE: " + average);
+        for (int vertex : minPath) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minPath.get(0));
+    }
+
+    private static void greedyCycle_GRASP(Graph graph){
+        ArrayList<Integer> minPath = new ArrayList<>();
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+        int average;
+        for (int initialVertex = 0; initialVertex < graph.getVerticesCount(); ++initialVertex) {
+            HalfTSPResult result = HalfTSPGreedyCycle.GRASP(graph, initialVertex);
             int distance = result.getDistance();
             sum += distance;
             if (distance > max) {
