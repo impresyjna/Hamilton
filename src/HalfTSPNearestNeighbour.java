@@ -36,6 +36,7 @@ public class HalfTSPNearestNeighbour {
             actualVertex = vertexToAdd;
             freeVertices.remove(new Integer(vertexToAdd));
         }
+        cycleDistance += adjacencyMatrix[actualVertex][initialVertex]; 
 
         result.setDistance(cycleDistance);
         result.setPath(path);
