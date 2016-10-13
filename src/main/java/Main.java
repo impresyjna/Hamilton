@@ -28,6 +28,10 @@ public class Main {
 
             //nearestNeighbour wersja niedeterministyczna
             nearestNeighbourGRASP(graph);
+
+            //randomCycle wersja deterministyczna
+            randomCycle(graph);
+
         } catch (JAXBException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -78,5 +82,9 @@ public class Main {
 
     private static void nearestNeighbourGRASP(Graph graph) {
         printResults(graph, "Nearest Neihbour - GRASP", (g, initialVertex)->HalfTSPNearestNeighbour.GRASP(g, initialVertex));
+    }
+
+    private static void randomCycle(Graph graph) {
+        printResults(graph, "Random", (g, initialVertex)->HalfTSPRandom.randomCycle(g, initialVertex));
     }
 }
