@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 public class HalfTSPGreedyCycle {
 
     public static HalfTSPResult greedyCycle(Graph graph, int initialVertex) {
-        HalfTSPResult result = new HalfTSPResult();
         ArrayList<Integer> path = new ArrayList<>();
         int cycleDistance = 0;
         List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).boxed().collect(Collectors.toList());
@@ -43,15 +42,12 @@ public class HalfTSPGreedyCycle {
             freeVertices.remove(new Integer(vertexToAdd));
         }
 
-        result.setDistance(cycleDistance);
-        result.setPath(path);
-        return result;
+        return new HalfTSPResult(cycleDistance, path);
     }
 
     public static HalfTSPResult GRASP(Graph graph, int initialVertex) {
         Random generator = new Random();
 
-        HalfTSPResult result = new HalfTSPResult();
         ArrayList<Integer> path = new ArrayList<>();
         int cycleDistance = 0;
         List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).boxed().collect(Collectors.toList());
@@ -92,8 +88,6 @@ public class HalfTSPGreedyCycle {
             freeVertices.remove(new Integer(bestVerticesToAdd[index]));
         }
 
-        result.setDistance(cycleDistance);
-        result.setPath(path);
-        return result;
+        return new HalfTSPResult(cycleDistance, path);
     }
 }

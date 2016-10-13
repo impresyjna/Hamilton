@@ -5,7 +5,13 @@ import java.util.ArrayList;
  */
 public class HalfTSPResult {
     private int distance;
+
     private ArrayList<Integer> path;
+
+    public HalfTSPResult(int distance, ArrayList<Integer> path) {
+        this.distance = distance;
+        this.path = path;
+    }
 
     public int getDistance() {
         return distance;

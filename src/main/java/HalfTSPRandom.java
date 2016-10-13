@@ -9,7 +9,6 @@ import java.util.stream.IntStream;
  */
 public class HalfTSPRandom {
     public static HalfTSPResult randomCycle(Graph graph, int initialVertex) {
-        HalfTSPResult result = new HalfTSPResult();
         ArrayList<Integer> path = new ArrayList<>();
         int cycleDistance = 0;
         List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).boxed().collect(Collectors.toList());
@@ -34,8 +33,6 @@ public class HalfTSPRandom {
         }
         cycleDistance += adjacencyMatrix[actualVertex][initialVertex];
 
-        result.setDistance(cycleDistance);
-        result.setPath(path);
-        return result;
+        return new HalfTSPResult(cycleDistance, path);
     }
 }
