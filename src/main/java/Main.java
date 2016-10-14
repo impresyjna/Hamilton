@@ -11,23 +11,13 @@ public class Main {
         try {
             graph = Graph.readTSPFile("kroA100.tsp");
 
-            //greedyCycle wersja deterministyczna
-            greedyCycle(graph);
-
-            //greedyCycle wersja niedeterministyczna
-            greedyCycle_GRASP(graph);
-
-            //nearestNeighbour wersja deterministyczna
-            nearestNeighbour(graph);
-
-            //nearestNeighbour wersja niedeterministyczna
-            nearestNeighbourGRASP(graph);
-
             //lokalne wyszukiwanie
             localSearch_nearestNeighbour(graph);
             localSearch_nearestNeighbourGRASP(graph);
             localSearch_greedyCycle(graph);
             localSearch_greedyCycleGRASP(graph);
+            localSearch_randomCycle(graph);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,21 +53,6 @@ public class Main {
         System.out.println();
     }
 
-    private static void greedyCycle(Graph graph) {
-        printResults(graph, "GreedyCycle", (g, initialVertex) -> HalfTSPGreedyCycle.greedyCycle(g, initialVertex));
-    }
-
-    private static void greedyCycle_GRASP(Graph graph) {
-        printResults(graph, "GreedyCycle - GRASP", (g, initialVertex) -> HalfTSPGreedyCycle.GRASP(g, initialVertex));
-    }
-
-    private static void nearestNeighbour(Graph graph) {
-        printResults(graph, "Nearest Neihbour", (g, initialVertex) -> HalfTSPNearestNeighbour.nearestNeighbour(g, initialVertex));
-    }
-
-    private static void nearestNeighbourGRASP(Graph graph) {
-        printResults(graph, "Nearest Neihbour - GRASP", (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
-    }
 
     private static void localSearch_nearestNeighbour(Graph graph) {
         printResults(graph, "Local Cycle with initial Nearest Neighbour", (g, initialVertex) -> HalfTSPLocalSearch.localSearch(g, initialVertex, (g2, initialVertex2) -> HalfTSPNearestNeighbour.nearestNeighbour(g2, initialVertex2)));
@@ -93,5 +68,9 @@ public class Main {
 
     private static void localSearch_greedyCycleGRASP(Graph graph) {
         printResults(graph, "Local Cycle with initial Greedy Cycle with GRASP", (g, initialVertex) -> HalfTSPLocalSearch.localSearch(g, initialVertex, (g2, initialVertex2) -> HalfTSPGreedyCycle.GRASP(g2, initialVertex2)));
+    }
+
+    private static void localSearch_randomCycle(Graph graph) {
+        printResults(graph, "Local Cycle with initial random Cycle", (g, initialVertex) -> HalfTSPLocalSearch.localSearch(g, initialVertex, (g2, initialVertex2) -> HalfTSPRandom.randomCycle(g2, initialVertex2)));
     }
 }
