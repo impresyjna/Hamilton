@@ -9,10 +9,10 @@ import java.util.stream.IntStream;
  * Created by jakub on 11.10.2016.
  */
 public class HalfTSPLocalSearch {
-    public static HalfTSPResult localSearch(Graph graph, int initialVertex, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {
+    public static HalfTSPResult_LocalSearch localSearch(Graph graph, int initialVertex, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {
         boolean notFound;
         HalfTSPResult initialResult = algorithm.apply(graph, initialVertex);
-        ArrayList<Integer> cycle = initialResult.getPath();
+        ArrayList<Integer> cycle = new ArrayList<>(initialResult.getPath());
         int distance = initialResult.getDistance();
         List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).filter(v -> !cycle.contains(v)).boxed().collect(Collectors.toList());
         int verticesInCycleCount = graph.getVerticesCount() / 2;
@@ -74,6 +74,6 @@ public class HalfTSPLocalSearch {
                 distance += minChange;
             }
         } while (!notFound);
-        return new HalfTSPResult(distance, cycle);
+        return new HalfTSPResult_LocalSearch(distance, cycle, initialResult);
     }
 }
