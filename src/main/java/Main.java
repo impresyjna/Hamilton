@@ -67,7 +67,7 @@ public class Main {
             for (int vertex : minResult_localSearchInitialResult.getPath()) {
                 System.out.print(vertex + " -> ");
             }
-            System.out.println(minResult_localSearch.getPath().get(0));
+            System.out.println(minResult_localSearchInitialResult.getPath().get(0));
         }
 
         System.out.println("MIN cycle:");

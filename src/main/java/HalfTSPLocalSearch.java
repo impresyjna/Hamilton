@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,7 +11,7 @@ import java.util.stream.IntStream;
  */
 public class HalfTSPLocalSearch {
     public static HalfTSPResult_LocalSearch localSearch(Graph graph, int initialVertex, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {
-        boolean notFound;
+        boolean found;
         HalfTSPResult initialResult = algorithm.apply(graph, initialVertex);
         ArrayList<Integer> cycle = new ArrayList<>(initialResult.getPath());
         int distance = initialResult.getDistance();
@@ -19,7 +20,7 @@ public class HalfTSPLocalSearch {
         int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
 
         do {
-            notFound = true;
+            found = false;
             int minChange = 0;
             int vertex1IndexToChange = -1;
             int vertex2IndexToChange = -1;
@@ -59,7 +60,7 @@ public class HalfTSPLocalSearch {
             }
 
             if (minChange < 0) {
-                notFound = false;
+                found = true;
                 if (changeInsideCycle) {
                     ArrayList<Integer> subPath = new ArrayList<>(cycle.subList(vertex1IndexToChange + 1, vertex2IndexToChange + 1));
                     cycle.removeAll(subPath);
@@ -73,7 +74,20 @@ public class HalfTSPLocalSearch {
                 }
                 distance += minChange;
             }
-        } while (!notFound);
+        } while (found);
         return new HalfTSPResult_LocalSearch(distance, cycle, initialResult);
+    }
+
+    public static HalfTSPResult_LocalSearch multipleStartLocalSearch(Graph graph, BiFunction<Graph, Integer, HalfTSPResult> algorithm, int repeatsCount) {
+        Random generator = new Random();
+        int verticesCount = graph.getVerticesCount();
+        HalfTSPResult_LocalSearch minResult = null;
+        for (int i = 0; i < repeatsCount; ++i) {
+            HalfTSPResult_LocalSearch currentResult = localSearch(graph, generator.nextInt(verticesCount), algorithm);
+            if (currentResult.getDistance() < minResult.getDistance()) {
+                minResult = currentResult;
+            }
+        }
+        return minResult;
     }
 }
