@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.function.BiFunction;
 
 /**
@@ -10,7 +9,7 @@ public class Main {
         Graph graph;
         try {
             graph = Graph.readTSPFile("kroA100.tsp");
-
+/*
             //nearest neighbour
             nearestNeighbour(graph);
             nearestNeighbour_GRASP(graph);
@@ -25,10 +24,133 @@ public class Main {
             localSearch_greedyCycle(graph);
             localSearch_greedyCycleGRASP(graph);
             localSearch_randomCycle(graph);
+*/
 
+            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void compareMultipleStartAndIteratedLocalSearch(Graph graph, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {
+        System.out.println("Multiple Start Local Search");
+        int repeatNumber = 10;
+        HalfTSPResult_LocalSearch minResult = null;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+        int average;
+
+        long minTime = Long.MAX_VALUE;
+        long maxTime = Long.MIN_VALUE;
+        long sumTime = 0;
+        double averageTime;
+
+        for (int i = 0; i < repeatNumber; ++i) {
+            long startTime = System.nanoTime();
+            HalfTSPResult_LocalSearch result = HalfTSPLocalSearch.multipleStartLocalSearch(graph, algorithm, 1000);
+            int distance = result.getDistance();
+            if (min > distance) {
+                minResult = result;
+                min = distance;
+            } else if (max < distance) {
+                max = distance;
+            }
+            sum += distance;
+            long endTime = System.nanoTime();
+
+            long timeDifference = endTime - startTime;
+            if (minTime > timeDifference) {
+                minTime = timeDifference;
+            }
+            if (maxTime < timeDifference) {
+                maxTime = timeDifference;
+            }
+            sumTime += timeDifference;
+        }
+        average = sum / repeatNumber;
+        System.out.println("MAX distance: " + max);
+        System.out.println("MIN distance: " + min);
+        System.out.println("AVERAGE distance: " + average);
+
+        averageTime = sumTime / (repeatNumber * 1.0);
+        System.out.println("MAX time: " + maxTime / 1000000.0 + "ms");
+        System.out.println("MIN time: " + minTime / 1000000.0 + "ms");
+        System.out.println("AVERAGE time: " + averageTime / 1000000.0 + "ms");
+
+        HalfTSPResult minResult_InitialResult = minResult.getInitialResult();
+        System.out.println("MIN initial distance: " + minResult_InitialResult.getDistance());
+        System.out.println("MIN initial cycle:");
+        for (int vertex : minResult_InitialResult.getPath()) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minResult_InitialResult.getPath().get(0));
+
+        System.out.println("MIN cycle:");
+        for (int vertex : minResult.getPath()) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minResult.getPath().get(0));
+        System.out.println();
+
+
+        System.out.println("Iterated Local Search");
+
+        minResult = null;
+        min = Integer.MAX_VALUE;
+        max = Integer.MIN_VALUE;
+        sum = 0;
+
+        minTime = Long.MAX_VALUE;
+        maxTime = Long.MIN_VALUE;
+        sumTime = 0;
+
+        for (int i = 0; i < repeatNumber; ++i) {
+            long startTime = System.nanoTime();
+            HalfTSPResult_LocalSearch result = HalfTSPLocalSearch.iteratedLocalSearch(graph, algorithm, (long) averageTime);
+            int distance = result.getDistance();
+            if (min > distance) {
+                minResult = result;
+                min = distance;
+            }
+            if (max < distance) {
+                max = distance;
+            }
+            sum += distance;
+            long endTime = System.nanoTime();
+
+            long timeDifference = endTime - startTime;
+            if (minTime > timeDifference) {
+                minTime = timeDifference;
+            } else if (maxTime < timeDifference) {
+                maxTime = timeDifference;
+            }
+            sumTime += timeDifference;
+        }
+        average = sum / repeatNumber;
+        System.out.println("MAX distance: " + max);
+        System.out.println("MIN distance: " + min);
+        System.out.println("AVERAGE distance: " + average);
+
+        averageTime = sumTime / (repeatNumber * 1.0);
+        System.out.println("MAX time: " + maxTime / 1000000.0 + "ms");
+        System.out.println("MIN time: " + minTime / 1000000.0 + "ms");
+        System.out.println("AVERAGE time: " + averageTime / 1000000.0 + "ms");
+
+        minResult_InitialResult = minResult.getInitialResult();
+        System.out.println("MIN initial distance: " + minResult_InitialResult.getDistance());
+        System.out.println("MIN initial cycle:");
+        for (int vertex : minResult_InitialResult.getPath()) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minResult_InitialResult.getPath().get(0));
+
+        System.out.println("MIN cycle:");
+        for (int vertex : minResult.getPath()) {
+            System.out.print(vertex + " -> ");
+        }
+        System.out.println(minResult.getPath().get(0));
+        System.out.println();
     }
 
     private static void printResults(Graph graph, String algorithmName, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {

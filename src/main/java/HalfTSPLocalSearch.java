@@ -84,10 +84,56 @@ public class HalfTSPLocalSearch {
         HalfTSPResult_LocalSearch minResult = null;
         for (int i = 0; i < repeatsCount; ++i) {
             HalfTSPResult_LocalSearch currentResult = localSearch(graph, generator.nextInt(verticesCount), algorithm);
-            if (currentResult.getDistance() < minResult.getDistance()) {
+            if (minResult == null || currentResult.getDistance() < minResult.getDistance()) {
                 minResult = currentResult;
             }
         }
         return minResult;
+    }
+
+    public static HalfTSPResult_LocalSearch iteratedLocalSearch(Graph graph, BiFunction<Graph, Integer, HalfTSPResult> algorithm, long timeRestriction) {
+        Random generator = new Random();
+        int verticesCount = graph.getVerticesCount();
+        long startTime = System.nanoTime();
+        long endTime;
+        HalfTSPResult_LocalSearch minResult = localSearch(graph, generator.nextInt(verticesCount), algorithm);
+        do {
+            HalfTSPResult perturbation = perturbation(graph, minResult);
+            HalfTSPResult_LocalSearch currentResult = localSearch(graph, -1, (g, initialVertex) -> perturbation);
+            if (currentResult.getDistance() < minResult.getDistance()) {
+                minResult.setPath(currentResult.getPath());
+                minResult.setDistance(currentResult.getDistance());
+            }
+            endTime = System.nanoTime();
+        } while (endTime - startTime < timeRestriction);
+        return minResult;
+    }
+
+    private static HalfTSPResult perturbation(Graph graph, HalfTSPResult result) {
+        Random generator = new Random();
+        int distance = result.getDistance();
+        ArrayList<Integer> cycle = new ArrayList<>(result.getPath());
+        int verticesInCycleCount = cycle.size();
+        List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).filter(v -> !cycle.contains(v)).boxed().collect(Collectors.toList());
+        int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
+
+        for (int i = 0; i < 2; ++i) {
+            int vertex1Index = generator.nextInt(cycle.size());
+            int vertex1 = cycle.get(vertex1Index);
+            int vertex1Prev = cycle.get((vertex1Index + verticesInCycleCount - 1) % verticesInCycleCount);
+            int vertex1Next = cycle.get((vertex1Index + 1) % verticesInCycleCount);
+            int vertex2 = freeVertices.get(generator.nextInt(freeVertices.size()));
+
+            int change = adjacencyMatrix[vertex1Prev][vertex2] + adjacencyMatrix[vertex2][vertex1Next] -
+                    adjacencyMatrix[vertex1Prev][vertex1] - adjacencyMatrix[vertex1][vertex1Next];
+
+            freeVertices.add(vertex1);
+            freeVertices.remove(new Integer(vertex2));
+            cycle.remove(new Integer(vertex1));
+            cycle.add(vertex1Index, vertex2);
+            distance += change;
+        }
+
+        return new HalfTSPResult(distance, cycle);
     }
 }
