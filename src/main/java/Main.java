@@ -1,5 +1,12 @@
+import javafx.util.Pair;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by impresyjna on 04.10.2016.
@@ -26,9 +33,87 @@ public class Main {
             localSearch_randomCycle(graph);
 */
 
-            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
+//            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
+
+            countSimilarities(graph);
+
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void countSimilarities(Graph graph) {
+        Random generator = new Random();
+        int verticesCount = graph.getVerticesCount();
+
+        HalfTSPResult[] results = new HalfTSPResult[1000];
+        HalfTSPResult minResult = null;
+        int minResultIndex = -1;
+        for (int i = 0; i < 1000; ++i) {
+            HalfTSPResult currentResult = HalfTSPLocalSearch.localSearch(graph, generator.nextInt(verticesCount), (g, initialVertex) -> HalfTSPRandom.randomCycle(g, initialVertex));
+            if (minResult == null || currentResult.getDistance() < minResult.getDistance()) {
+                minResult = currentResult;
+                minResultIndex = i;
+            }
+            results[i] = currentResult;
+        }
+
+        long[] verticesSimilaritySum = new long[1000];
+        long[] edgesSimilaritySum = new long[1000];
+        long[] verticesSimilarityWithMin = new long[1000];
+        long[] edgesSimilarityWithMin = new long[1000];
+
+
+        List<Pair<Integer, Integer>>[] edges = new ArrayList[1000];
+
+        for (int i = 0; i < 1000; ++i) {
+            int verticesInCycleCount;
+            ArrayList<Integer> cycle = results[i].getPath();
+            verticesInCycleCount = cycle.size();
+            edges[i] = IntStream.range(0, verticesInCycleCount).mapToObj(index -> new Pair<>(cycle.get(index), cycle.get((index + 1) % verticesInCycleCount))).collect(Collectors.toList());
+        }
+
+        ArrayList<Integer> minResultPath = minResult.getPath();
+        List<Pair<Integer, Integer>> minResultEdges = IntStream.range(0, minResultPath.size()).mapToObj(index -> new Pair<>(minResultPath.get(index), minResultPath.get((index + 1) % minResultPath.size()))).collect(Collectors.toList());
+
+        for (int i = 0; i < 1000; ++i) {
+            ArrayList<Integer> result1 = results[i].getPath();
+            for (int j = i + 1; j < 1000; ++j) {
+                ArrayList<Integer> result2 = results[j].getPath();
+                long verticesSimilarity = result1.stream().filter(result2::contains).count();
+                verticesSimilaritySum[i] += verticesSimilarity;
+                verticesSimilaritySum[j] += verticesSimilarity;
+
+                long edgesSimilarity = edges[i].stream().filter(edges[j]::contains).count();
+                edgesSimilaritySum[i] += edgesSimilarity;
+                edgesSimilaritySum[j] += edgesSimilarity;
+            }
+
+            if (i != minResultIndex) {
+                verticesSimilarityWithMin[i] = minResultPath.stream().filter(result1::contains).count();
+                edgesSimilarityWithMin[i] = minResultEdges.stream().filter(edges[i]::contains).count();
+            }
+        }
+
+        for (int i = 0; i < 1000; ++i) {
+            System.out.println(results[i].getDistance() + "\t" + verticesSimilaritySum[i] / 999.0);
+        }
+        System.out.println();
+
+        for (int i = 0; i < 1000; ++i) {
+            System.out.println(results[i].getDistance() + "\t" + edgesSimilaritySum[i] / 999.0);
+        }
+        System.out.println();
+
+        for (int i = 0; i < 1000; ++i) {
+            if (i != minResultIndex)
+                System.out.println(results[i].getDistance() + "\t" + verticesSimilarityWithMin[i]);
+        }
+        System.out.println();
+
+        for (int i = 0; i < 1000; ++i) {
+            if (i != minResultIndex)
+                System.out.println(results[i].getDistance() + "\t" + edgesSimilarityWithMin[i]);
         }
     }
 
