@@ -117,23 +117,55 @@ public class HalfTSPLocalSearch {
         List<Integer> freeVertices = IntStream.range(0, graph.getVerticesCount()).filter(v -> !cycle.contains(v)).boxed().collect(Collectors.toList());
         int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
 
-        for (int i = 0; i < 2; ++i) {
-            int vertex1Index = generator.nextInt(cycle.size());
-            int vertex1 = cycle.get(vertex1Index);
-            int vertex1Prev = cycle.get((vertex1Index + verticesInCycleCount - 1) % verticesInCycleCount);
-            int vertex1Next = cycle.get((vertex1Index + 1) % verticesInCycleCount);
-            int vertex2 = freeVertices.get(generator.nextInt(freeVertices.size()));
+        int vertex1Index, vertex1, vertex1Prev, vertex1NextIndex, vertex1Next;
+        int vertex2Index, vertex2, vertex2NextIndex, vertex2Next;
+        int change;
 
-            int change = adjacencyMatrix[vertex1Prev][vertex2] + adjacencyMatrix[vertex2][vertex1Next] -
-                    adjacencyMatrix[vertex1Prev][vertex1] - adjacencyMatrix[vertex1][vertex1Next];
+        //for (int i = 0; i < 2; ++i) {
+        vertex1Index = generator.nextInt(cycle.size());
+        vertex1 = cycle.get(vertex1Index);
+        vertex1Prev = cycle.get((vertex1Index + verticesInCycleCount - 1) % verticesInCycleCount);
+        vertex1Next = cycle.get((vertex1Index + 1) % verticesInCycleCount);
+        vertex2 = freeVertices.get(generator.nextInt(freeVertices.size()));
 
-            freeVertices.add(vertex1);
-            freeVertices.remove(new Integer(vertex2));
-            cycle.remove(new Integer(vertex1));
-            cycle.add(vertex1Index, vertex2);
-            distance += change;
+        change = adjacencyMatrix[vertex1Prev][vertex2] + adjacencyMatrix[vertex2][vertex1Next] -
+                adjacencyMatrix[vertex1Prev][vertex1] - adjacencyMatrix[vertex1][vertex1Next];
+
+        freeVertices.add(vertex1);
+        freeVertices.remove(new Integer(vertex2));
+        cycle.remove(new Integer(vertex1));
+        cycle.add(vertex1Index, vertex2);
+        distance += change;
+        //}
+
+        vertex1Index = generator.nextInt(cycle.size());
+        vertex1NextIndex = (vertex1Index + 1) % verticesInCycleCount;
+        while ((vertex2Index = generator.nextInt(cycle.size())) == vertex1Index) ;
+        vertex2NextIndex = (vertex2Index + 1) % verticesInCycleCount;
+        if (vertex1NextIndex > vertex2NextIndex) {
+            int tmp = vertex2NextIndex;
+            vertex2NextIndex = vertex1NextIndex;
+            vertex1NextIndex = tmp;
+
+            tmp = vertex2Index;
+            vertex2Index = vertex1Index;
+            vertex1Index = tmp;
         }
 
+        vertex1 = cycle.get(vertex1Index);
+        vertex1Next = cycle.get(vertex1NextIndex);
+        vertex2 = cycle.get(vertex2Index);
+        vertex2Next = cycle.get(vertex2NextIndex);
+
+        ArrayList<Integer> subPath = new ArrayList<>(cycle.subList(vertex1NextIndex, vertex2NextIndex));
+        cycle.removeAll(subPath);
+        Collections.reverse(subPath);
+        cycle.addAll(vertex1NextIndex, subPath);
+
+        change = adjacencyMatrix[vertex1][vertex2] + adjacencyMatrix[vertex1Next][vertex2Next] -
+                adjacencyMatrix[vertex1][vertex1Next] - adjacencyMatrix[vertex2][vertex2Next];
+        distance += change;
+        //}
         return new HalfTSPResult(distance, cycle);
     }
 }

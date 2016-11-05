@@ -33,9 +33,9 @@ public class Main {
             localSearch_randomCycle(graph);
 */
 
-//            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
+            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
 
-            countSimilarities(graph);
+//            countSimilarities(graph);
 
         } catch (IOException e) {
             e.printStackTrace();
