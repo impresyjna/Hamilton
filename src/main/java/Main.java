@@ -33,13 +33,102 @@ public class Main {
             localSearch_randomCycle(graph);
 */
 
-            compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
+            //compareMultipleStartAndIteratedLocalSearch(graph, (g, initialVertex) -> HalfTSPNearestNeighbour.GRASP(g, initialVertex));
 
-//            countSimilarities(graph);
-
+            compareMultipleStartLocalSearchAndHybridEvolutionAlgorithm(graph, HalfTSPNearestNeighbour::GRASP);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void compareMultipleStartLocalSearchAndHybridEvolutionAlgorithm(Graph graph, BiFunction<Graph, Integer, HalfTSPResult> algorithm) {
+        System.out.println("Multiple Start Local Search");
+        int repeatNumber = 10;
+        HalfTSPResult_LocalSearch minResult = null;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int sum = 0;
+        int average;
+
+        long minTime = Long.MAX_VALUE;
+        long maxTime = Long.MIN_VALUE;
+        long sumTime = 0;
+        double averageTime;
+
+        for (int i = 0; i < repeatNumber; ++i) {
+            long startTime = System.nanoTime();
+            HalfTSPResult_LocalSearch result = HalfTSPLocalSearch.multipleStartLocalSearch(graph, algorithm, 1000);
+            int distance = result.getDistance();
+            if (min > distance) {
+                minResult = result;
+                min = distance;
+            } else if (max < distance) {
+                max = distance;
+            }
+            sum += distance;
+            long endTime = System.nanoTime();
+
+            long timeDifference = endTime - startTime;
+            if (minTime > timeDifference) {
+                minTime = timeDifference;
+            }
+            if (maxTime < timeDifference) {
+                maxTime = timeDifference;
+            }
+            sumTime += timeDifference;
+        }
+        average = sum / repeatNumber;
+        System.out.println("MAX distance: " + max);
+        System.out.println("MIN distance: " + min);
+        System.out.println("AVERAGE distance: " + average);
+
+        averageTime = sumTime / (repeatNumber * 1.0);
+        System.out.println("MAX time: " + maxTime / 1000000.0 + "ms");
+        System.out.println("MIN time: " + minTime / 1000000.0 + "ms");
+        System.out.println("AVERAGE time: " + averageTime / 1000000.0 + "ms");
+
+        System.out.println("\nHybrid Evolution Algorithm");
+        HalfTSPResult_HybridEvolutionAlgorithm minHybridResult = null;
+        min = Integer.MAX_VALUE;
+        max = Integer.MIN_VALUE;
+        sum = 0;
+
+        minTime = Long.MAX_VALUE;
+        maxTime = Long.MIN_VALUE;
+        sumTime = 0;
+
+
+        for (int i = 0; i < repeatNumber; ++i) {
+            long startTime = System.nanoTime();
+            HalfTSPResult_HybridEvolutionAlgorithm result = HalfTSPHybridEvolutionAlgorithm.algorithm(graph, algorithm, (long) averageTime);
+            int distance = result.getDistance();
+            if (min > distance) {
+                minHybridResult = result;
+                min = distance;
+            } else if (max < distance) {
+                max = distance;
+            }
+            sum += distance;
+            long endTime = System.nanoTime();
+
+            long timeDifference = endTime - startTime;
+            if (minTime > timeDifference) {
+                minTime = timeDifference;
+            }
+            if (maxTime < timeDifference) {
+                maxTime = timeDifference;
+            }
+            sumTime += timeDifference;
+        }
+        average = sum / repeatNumber;
+        System.out.println("MAX distance: " + max);
+        System.out.println("MIN distance: " + min);
+        System.out.println("AVERAGE distance: " + average);
+
+        averageTime = sumTime / (repeatNumber * 1.0);
+        System.out.println("MAX time: " + maxTime / 1000000.0 + "ms");
+        System.out.println("MIN time: " + minTime / 1000000.0 + "ms");
+        System.out.println("AVERAGE time: " + averageTime / 1000000.0 + "ms");
     }
 
     private static void countSimilarities(Graph graph) {
