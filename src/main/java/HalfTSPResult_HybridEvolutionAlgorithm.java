@@ -8,18 +8,18 @@ import java.util.Dictionary;
  */
 public class HalfTSPResult_HybridEvolutionAlgorithm extends HalfTSPResult {
 
-    private Dictionary<Integer, Pair<Long, Integer>> chartData;
+    private ArrayList<Pair<Long, Integer>> chartData;
 
-    public HalfTSPResult_HybridEvolutionAlgorithm(int distance, ArrayList<Integer> path, Dictionary<Integer, Pair<Long, Integer>> chartData) {
+    public HalfTSPResult_HybridEvolutionAlgorithm(int distance, ArrayList<Integer> path, ArrayList<Pair<Long, Integer>> chartData) {
         super(distance, path);
         this.chartData = chartData;
     }
 
-    public Dictionary<Integer, Pair<Long, Integer>> getChartData() {
+    public ArrayList<Pair<Long, Integer>> getChartData() {
         return chartData;
     }
 
-    public void setChartData(Dictionary<Integer, Pair<Long, Integer>> chartData) {
+    public void setChartData(ArrayList<Pair<Long, Integer>> chartData) {
         this.chartData = chartData;
     }
 }

@@ -2,6 +2,7 @@ import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -129,6 +130,11 @@ public class Main {
         System.out.println("MAX time: " + maxTime / 1000000.0 + "ms");
         System.out.println("MIN time: " + minTime / 1000000.0 + "ms");
         System.out.println("AVERAGE time: " + averageTime / 1000000.0 + "ms");
+
+        int iteration = 0;
+        for (Pair<Long, Integer> data : minHybridResult.getChartData()) {
+            System.out.println((iteration++) + "\t" + (data.getKey() / 1000000.0) + "\t" + data.getValue());
+        }
     }
 
     private static void countSimilarities(Graph graph) {

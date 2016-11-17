@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 public class HalfTSPHybridEvolutionAlgorithm {
     public static HalfTSPResult_HybridEvolutionAlgorithm algorithm(Graph graph, BiFunction<Graph, Integer, HalfTSPResult> algorithm, long constraint) {
         long startTime = System.nanoTime();
-        Dictionary<Integer, Pair<Long, Integer>> chartData = new Hashtable<>();
+        ArrayList<Pair<Long, Integer>> chartData = new ArrayList<>();
         int verticesCount = graph.getVerticesCount();
         int[][] adjacencyMatrix = graph.getAdjacencyMatrix();
         Random generator = new Random();
@@ -67,12 +67,11 @@ public class HalfTSPHybridEvolutionAlgorithm {
                 int vertex2 = newPath.get((i + 1) % verticesInPath);
                 distance += adjacencyMatrix[vertex1][vertex2];
             }
-            distance += adjacencyMatrix[newPath.get(verticesInPath - 1)][newPath.get(0)];
             HalfTSPResult initialResult = new HalfTSPResult(distance, newPath);
 
             long localSearchStartTime = System.nanoTime();
             HalfTSPResult newResult = HalfTSPLocalSearch.localSearch(graph, -1, (g, init) -> initialResult);
-            chartData.put(iteration++, new Pair<>(System.nanoTime() - localSearchStartTime, newResult.getDistance()));
+            chartData.add(new Pair<>(System.nanoTime() - localSearchStartTime, newResult.getDistance()));
 
             HalfTSPResult maxResult = population.stream().max((r1, r2) -> r1.getDistance() < r2.getDistance() ? -1 : 1).get();
 
